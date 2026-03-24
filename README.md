@@ -1,269 +1,210 @@
-# [Sponsored by Recall AI - API for desktop recording](https://www.recall.ai/product/desktop-recording-sdk?utm_source=github&utm_medium=sponsorship&utm_campaign=prat011-free-cluely)
-If you’re looking for a hosted desktop recording API, consider checking out [Recall.ai](https://www.recall.ai/product/desktop-recording-sdk?utm_source=github&utm_medium=sponsorship&utm_campaign=prat011-free-cluely), an API that records Zoom, Google Meet, Microsoft Teams, in-person meetings, and more.
+# WinHoverChat
 
-# Cluely
-
-[Cluely](https://cluely.com) - The invisible desktop assistant that provides real-time insights, answers, and support during meetings, interviews, presentations, and professional conversations.
-
-
-## 🚀 Quick Start Guide
-
-### Prerequisites
-- Make sure you have Node.js installed on your computer
-- Git installed on your computer  
-- **Either** a Gemini API key (get it from [Google AI Studio](https://makersuite.google.com/app/apikey))
-- **Or** Ollama installed locally for private LLM usage (recommended for privacy)
-
-### Installation Steps
-
-1. Clone the repository:
-```bash
-git clone [repository-url]
-cd free-cluely
-```
-
-2. Install dependencies:
-```bash
-# If you encounter Sharp/Python build errors, use this:
-SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --ignore-scripts
-npm rebuild sharp
-
-# Or for normal installation:
-npm install
-```
-
-3. Set up environment variables:
-   - Create a file named `.env` in the root folder
-   
-   **For Gemini (Cloud AI):**
-   ```env
-   GEMINI_API_KEY=your_api_key_here
-   ```
-   
-   **For Ollama (Local/Private AI):**
-   ```env
-   USE_OLLAMA=true
-   OLLAMA_MODEL=llama3.2
-   OLLAMA_URL=http://localhost:11434
-   ```
-   
-   - Save the file
-
-### Running the App
-
-#### Method 1: Development Mode (Recommended for first run)
-1. Start the development server:
-```bash
-npm start
-```
-
-This command automatically:
-- Starts the Vite dev server on port 5180
-- Waits for the server to be ready
-- Launches the Electron app
-
-#### Method 2: Production Build
-```bash
-npm run dist
-```
-The built app will be in the `release` folder.
-
-## 🤖 AI Provider Options
-
-### Ollama (Recommended for Privacy)
-**Pros:**
-- 100% private - data never leaves your computer
-- No API costs
-- Works offline
-- Supports many models: llama3.2, codellama, mistral, etc.
-
-**Setup:**
-1. Install Ollama from [ollama.ai](https://ollama.ai)
-2. Pull a model: `ollama pull llama3.2`
-3. Set environment variables as shown above
-
-### Google Gemini
-**Pros:**
-- Latest AI technology
-- Fastest responses
-- Best accuracy for complex tasks
-
-**Cons:**
-- Requires API key and internet
-- Data sent to Google servers
-- Usage costs apply
-
-### ⚠️ Important Notes
-
-1. **Closing the App**: 
-   - Press `Cmd + Q` (Mac) or `Ctrl + Q` (Windows/Linux) to quit
-   - Or use Activity Monitor/Task Manager to close `Interview Coder`
-   - The X button currently doesn't work (known issue)
-
-2. **If the app doesn't start**:
-   - Make sure no other app is using port 5180
-   - Try killing existing processes:
-   
-     ```bash
-     # Find processes using port 5180
-     lsof -i :5180
-     # Kill them (replace [PID] with the process ID)
-     kill [PID]
-     ```
-   - For Ollama users: Make sure Ollama is running (`ollama serve`)
-
-3. **Keyboard Shortcuts**:
-   - `Cmd/Ctrl + B`: Toggle window visibility
-   - `Cmd/Ctrl + H`: Take screenshot
-   - 'Cmd/Enter': Get solution
-   - `Cmd/Ctrl + Arrow Keys`: Move window
-
-## 🔧 Troubleshooting
-
-### Windows Issues Fixed 
-- **UI not loading**: Port mismatch resolved
-- **Electron crashes**: Improved error handling  
-- **Build failures**: Production config updated
-- **Window focus problems**: Platform-specific fixes applied
-
-### Ubuntu/Linux Issues Fixed 
-- **Window interaction**: Fixed focusable settings
-- **Installation confusion**: Clear setup instructions
-- **Missing dependencies**: All requirements documented
-
-### Common Solutions
-
-#### Sharp/Python Build Errors
-If you see `gyp ERR! find Python` or Sharp build errors:
-```bash
-# Solution 1: Use prebuilt binaries
-rm -rf node_modules package-lock.json
-SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --ignore-scripts
-npm rebuild sharp
-
-# Solution 2: Or install Python (if you prefer building from source)
-brew install python3  # macOS
-# Then run: npm install
-```
-
-#### General Installation Issues
-If you see other errors:
-1. Delete the `node_modules` folder
-2. Delete `package-lock.json` 
-3. Run `npm install` again
-4. Try running with `npm start`
-
-### Platform-Specific Notes
-- **Windows**: App now works on Windows 10/11
-- **Ubuntu/Linux**: Tested on Ubuntu 20.04+ and most Linux distros  
-- **macOS**: Native support with proper window management
-
-## Key Features
-
-### **Invisible AI Assistant**
-- Translucent, always-on-top window that's barely noticeable
-- Hide/show instantly with global hotkeys
-- Works seamlessly across all applications
-
-### **Smart Screenshot Analysis** 
-- Take screenshots of any content with `Cmd/Ctrl + H`
-- AI analyzes images, documents, presentations, or problems
-- Get instant explanations, answers, and solutions
-
-### **Audio Intelligence**
-- Process audio files and recordings
-- Real-time transcription and analysis
-- Perfect for meeting notes and content review
-
-### **Contextual Chat**
-- Chat with AI about anything you see on screen
-- Maintains conversation context
-- Ask follow-up questions for deeper insights
-
-### **Privacy-First Design**
-- **Local AI Option**: Use Ollama for 100% private processing
-- **Cloud Option**: Google Gemini for maximum performance
-- Screenshots auto-deleted after processing
-- No data tracking or storage
-
-### **Cross-Platform Support**
-- **Windows 10/11** - Full support with native performance
-- **Ubuntu/Linux** - Optimized for all major distributions  
-- **macOS** - Native window management and shortcuts
-
-## Use Cases
-
-### **Academic & Learning**
-```
-✓ Live presentation support during classes
-✓ Quick research during online exams  
-✓ Language translation and explanations
-✓ Math and science problem solving
-```
-
-### **Professional Meetings**
-```
-✓ Sales call preparation and objection handling
-✓ Technical interview coaching
-✓ Client presentation support
-✓ Real-time fact-checking and data lookup
-```
-
-### **Development & Tech**
-```
-✓ Debug error messages instantly
-✓ Code explanation and optimization
-✓ Documentation and API references
-✓ Algorithm and architecture guidance
-```
-
-## Why Choose Free Cluely?
-
-| Feature | Free Cluely | Commercial Alternatives |
-|---------|-------------|------------------------|
-| **Cost** | 100% Free | $29-99/month |
-| **Privacy** | Local AI Option | Cloud-only |
-| **Open Source** | Full transparency | Closed source |
-| **Customization** | Fully customizable | Limited options |
-| **Data Control** | You own your data | Third-party servers |
-| **Offline Mode** | Yes (with Ollama) | No |
-
-## Technical Details
-
-### **AI Models Supported**
-- **Gemini 2.0 Flash** - Latest Google AI with vision capabilities
-- **Llama 3.2** - Meta's advanced local model via Ollama
-- **CodeLlama** - Specialized coding assistance
-- **Mistral** - Lightweight, fast responses
-- **Custom Models** - Any Ollama-compatible model
-
-### **System Requirements**
-```bash
-Minimum:  4GB RAM, Dual-core CPU, 2GB storage
-Recommended: 8GB+ RAM, Quad-core CPU, 5GB+ storage
-Optimal: 16GB+ RAM for local AI models
-```
-
-## 🤝 Contributing
-
-This project welcomes contributions! While I have limited time for active maintenance, I'll review and merge quality PRs.
-
-**Ways to contribute:**
-- 🐛 Bug fixes and stability improvements
-- ✨ New features and AI model integrations  
-- 📚 Documentation and tutorial improvements
-- 🌍 Translations and internationalization
-- 🎨 UI/UX enhancements
-
-For commercial integrations or custom development, reach out on [Twitter](https://x.com/prathitjoshi_)
-
-## 📄 License
-
-ISC License - Free for personal and commercial use.
+An invisible, always-on-top desktop AI assistant built with Electron. Capture your screen or audio, send it to an AI model, and get instant analysis — without ever leaving what you're doing.
 
 ---
 
-**⭐ Star this repo if Free Cluely helps you succeed in meetings, interviews, or presentations!**
+## Tech Stack
 
-### 🏷️ Tags
-`ai-assistant` `meeting-notes` `interview-helper` `presentation-support` `ollama` `gemini-ai` `electron-app` `cross-platform` `privacy-focused` `open-source` `local-ai` `screenshot-analysis` `academic-helper` `sales-assistant` `coding-companion`
+| Layer | Technology |
+|---|---|
+| Desktop Shell | Electron 33 |
+| Frontend | React 18 + TypeScript + Vite |
+| Styling | Tailwind CSS 3 |
+| AI (Cloud) | Google Gemini 2.0 Flash (with 1.5-flash and 1.5-flash-8b fallback) |
+| AI (Local) | Ollama (llama3.2, codellama, mistral, or any compatible model) |
+| Screenshot | `screenshot-desktop` |
+| Image Processing | Sharp (upscaling for vision model accuracy) |
+| OCR | Tesseract.js |
+| IPC | Electron's `ipcMain` / `ipcRenderer` via a sandboxed preload |
+| Build & Packaging | electron-builder (DMG, NSIS, AppImage, deb) |
+| Process Coordination | `concurrently` + `wait-on` |
+
+---
+
+## How It Works — Architecture & Workflow
+
+### 1. Application Bootstrap (`electron/main.ts`)
+
+The app uses a singleton `AppState` that owns four helper classes:
+
+- **WindowHelper** — creates and manages the transparent, always-on-top `BrowserWindow`
+- **ScreenshotHelper** — handles capture, upscaling, and queue management
+- **ProcessingHelper** — orchestrates AI calls and emits IPC events back to the renderer
+- **ShortcutsHelper** — registers all global hotkeys via Electron's `globalShortcut`
+
+On startup the app hides its dock icon, registers global shortcuts, and creates a system tray entry so it stays running silently in the background.
+
+### 2. The Overlay Window (`WindowHelper`)
+
+The window is:
+- Always on top, click-through by default
+- Translucent / frameless so it doesn't obstruct the user's workflow
+- Moveable via keyboard shortcuts without grabbing a title bar
+
+The renderer (React app) loads inside this window over a Vite dev server in development, or from the built `dist/` folder in production.
+
+### 3. Capturing Context (`ScreenshotHelper`)
+
+When the user presses `Alt+H`:
+
+1. The overlay window is **hidden** so it doesn't appear in the capture
+2. A 400ms pause lets the OS compositor flush the frame
+3. `screenshot-desktop` captures the full screen to a UUID-named `.png` in the app's userData folder
+4. **Sharp** upscales the image to at least 1920px wide (using Lanczos3) so vision models can read small text reliably
+5. The window is shown again and the screenshot path is sent to the renderer via IPC
+
+A rolling queue of up to 5 screenshots is maintained. Older ones are automatically deleted from disk.
+
+### 4. AI Processing (`ProcessingHelper` + `LLMHelper`)
+
+When the user presses `Alt+Enter`:
+
+```
+Screenshot Queue
+      │
+      ▼
+ProcessingHelper.processScreenshots()
+      │
+      ├─── view = "queue"  →  LLMHelper.analyzeImageFile()  →  problem extracted
+      │
+      └─── view = "solutions" (debug mode)
+               │
+               ├── LLMHelper.generateSolution(problemInfo)
+               └── LLMHelper.debugSolutionWithImages(problemInfo, code, extraScreenshots)
+```
+
+**Gemini path:** The `LLMHelper` holds a pre-built fallback chain — `gemini-2.0-flash` → `gemini-1.5-flash` → `gemini-1.5-flash-8b`. If a 429 quota error is hit, it waits 15 seconds and retries once on the same model before sliding to the next one.
+
+**Ollama path:** Calls the local Ollama HTTP API directly. The model is auto-detected from the running Ollama instance if not specified explicitly.
+
+Results are sent back to the renderer as typed IPC events (`PROBLEM_EXTRACTED`, `SOLUTION_SUCCESS`, `DEBUG_SUCCESS`, etc.).
+
+### 5. Renderer / UI (`src/`)
+
+The React app listens for IPC events from the main process and renders:
+
+- **Queue view** — shows thumbnail previews of captured screenshots, lets the user delete or reorder them
+- **Solutions view** — displays the AI's structured analysis, suggested responses, and code/text output
+- **Debug view** — shows diff output when a follow-up analysis is run against the current solution
+
+State flows one way: main process events → React state → UI update.
+
+### 6. IPC Bridge (`electron/preload.ts` + `ipcHandlers.ts`)
+
+A sandboxed preload script exposes a typed `window.electronAPI` surface to the renderer. All renderer→main calls go through `ipcRenderer.invoke()` (async request/response) and all main→renderer pushes use `webContents.send()` (fire-and-forget events).
+
+---
+
+## Keyboard Shortcuts
+
+| Shortcut | Action |
+|---|---|
+| `Alt+B` | Toggle window visibility |
+| `Alt+Shift+Space` | Center and show window |
+| `Alt+H` | Take a screenshot |
+| `Alt+Enter` | Process screenshot queue with AI |
+| `Alt+R` | Reset — clear queues and return to queue view |
+| `Alt+Arrow Keys` | Move window in any direction |
+
+---
+
+## Prerequisites
+
+- Node.js 18+
+- npm or pnpm
+- **One of:**
+  - A [Google Gemini API key](https://makersuite.google.com/app/apikey)
+  - [Ollama](https://ollama.ai) running locally
+
+---
+
+## Installation
+
+```bash
+git clone <repository-url>
+cd winhoverchat
+
+# Install dependencies
+# If you hit Sharp/Python build errors:
+SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --ignore-scripts
+npm rebuild sharp
+
+# Otherwise:
+npm install
+```
+
+### Environment Setup
+
+Create a `.env` file in the root directory:
+
+**Gemini (cloud):**
+```env
+GEMINI_API_KEY=your_api_key_here
+```
+
+**Ollama (local/private):**
+```env
+USE_OLLAMA=true
+OLLAMA_MODEL=llama3.2
+OLLAMA_URL=http://localhost:11434
+```
+
+---
+
+## Running
+
+**Development:**
+```bash
+npm start
+# Starts Vite on :5180, waits for it, then launches Electron
+```
+
+**Production build:**
+```bash
+npm run dist
+# Output goes to the release/ folder
+```
+
+---
+
+## Troubleshooting
+
+**App won't start / port in use:**
+```bash
+lsof -i :5180
+kill <PID>
+```
+
+**Sharp build errors:**
+```bash
+rm -rf node_modules package-lock.json
+SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --ignore-scripts
+npm rebuild sharp
+```
+
+**Ollama not responding:**
+Make sure the Ollama daemon is running:
+```bash
+ollama serve
+```
+
+**Window won't close:**
+Use `Ctrl+Q` / `Cmd+Q`, the system tray menu, or your OS task manager. The window's X button is intentionally non-functional to prevent accidental closes.
+
+---
+
+## System Requirements
+
+| | Minimum | Recommended |
+|---|---|---|
+| RAM | 4GB | 8GB (16GB+ for local models) |
+| CPU | Dual-core | Quad-core |
+| Storage | 2GB | 5GB+ |
+| OS | Windows 10, Ubuntu 20.04, macOS 11 | Latest of each |
+
+---
+
+## License
+
+ISC — free for personal and commercial use.

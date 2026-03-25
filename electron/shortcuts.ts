@@ -9,85 +9,63 @@ export class ShortcutsHelper {
   }
 
   public registerGlobalShortcuts(): void {
-    globalShortcut.register("Alt+Shift+Space", () => {
-      console.log("Show/Center window shortcut pressed...")
-      this.appState.centerAndShowWindow()
-    })
 
-    globalShortcut.register("Alt+H", async () => {
+    // F2 — capture + OCR + answer (full cycle)
+    // No browser assigns F2 any default action on exam pages
+    globalShortcut.register("F2", async () => {
+      console.log("[Shortcuts] F2 — capture and process")
+      this.appState.ensureWindow()
+
       const mainWindow = this.appState.getMainWindow()
-      if (mainWindow) {
-        console.log("Taking screenshot...")
-        try {
-          const screenshotPath = await this.appState.takeScreenshot()
-          const preview = await this.appState.getImagePreview(screenshotPath)
-          mainWindow.webContents.send("screenshot-taken", {
-            path: screenshotPath,
-            preview
-          })
-        } catch (error) {
-          console.error("Error capturing screenshot:", error)
-        }
+      if (!mainWindow || mainWindow.isDestroyed()) return
+
+      try {
+        mainWindow.webContents.send("processing-start")
+        await this.appState.processingHelper.captureAndProcess()
+      } catch (error: any) {
+        console.error("[Shortcuts] captureAndProcess failed:", error)
+        mainWindow.webContents.send("processing-error", error.message)
       }
     })
 
-    globalShortcut.register("Alt+Enter", async () => {
-      await this.appState.processingHelper.processScreenshots()
+    // F8 — toggle overlay hide/show
+    globalShortcut.register("F8", () => {
+      console.log("[Shortcuts] F8 — toggle visibility")
+      this.appState.ensureWindow()
+      this.appState.toggleMainWindow()
     })
 
-    globalShortcut.register("Alt+R", () => {
-      console.log(
-        "Alt + R pressed. Canceling requests and resetting queues..."
-      )
-
-      this.appState.processingHelper.cancelOngoingRequests()
-      this.appState.clearQueues()
-
-      console.log("Cleared queues.")
-
-      this.appState.setView("queue")
+    // F9 — reset, clear current answer
+    globalShortcut.register("F9", () => {
+      console.log("[Shortcuts] F9 — reset")
+      this.appState.ensureWindow()
+      this.appState.processingHelper.cancelOngoing()
 
       const mainWindow = this.appState.getMainWindow()
       if (mainWindow && !mainWindow.isDestroyed()) {
-        mainWindow.webContents.send("reset-view")
+        mainWindow.webContents.send("reset")
       }
     })
 
-    globalShortcut.register("Alt+Left", () => {
-      console.log("Alt + Left pressed. Moving window left.")
+    // Window repositioning — Ctrl+arrows
+    globalShortcut.register("Ctrl+Left", () => {
+      this.appState.ensureWindow()
       this.appState.moveWindowLeft()
     })
 
-    globalShortcut.register("Alt+Right", () => {
-      console.log("Alt + Right pressed. Moving window right.")
+    globalShortcut.register("Ctrl+Right", () => {
+      this.appState.ensureWindow()
       this.appState.moveWindowRight()
     })
 
-    globalShortcut.register("Alt+Down", () => {
-      console.log("Alt + Down pressed. Moving window down.")
-      this.appState.moveWindowDown()
-    })
-
-    globalShortcut.register("Alt+Up", () => {
-      console.log("Alt + Up pressed. Moving window up.")
+    globalShortcut.register("Ctrl+Up", () => {
+      this.appState.ensureWindow()
       this.appState.moveWindowUp()
     })
 
-    globalShortcut.register("Alt+B", () => {
-      this.appState.toggleMainWindow()
-      const mainWindow = this.appState.getMainWindow()
-      if (mainWindow && this.appState.isVisible()) {
-        mainWindow.setAlwaysOnTop(true)
-        mainWindow.focus()
-        if (process.platform === "darwin") {
-          mainWindow.setAlwaysOnTop(true, "normal")
-          setTimeout(() => {
-            if (mainWindow && !mainWindow.isDestroyed()) {
-              mainWindow.setAlwaysOnTop(true, "floating")
-            }
-          }, 100)
-        }
-      }
+    globalShortcut.register("Ctrl+Down", () => {
+      this.appState.ensureWindow()
+      this.appState.moveWindowDown()
     })
 
     app.on("will-quit", () => {

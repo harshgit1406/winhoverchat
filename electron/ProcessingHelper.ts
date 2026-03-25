@@ -1,178 +1,50 @@
-// ProcessingHelper.ts
-
 import { AppState } from "./main"
-import { LLMHelper } from "./LLMHelper"
+import { LLMHelper, OllamaConfig } from "./LLMHelper"
 import dotenv from "dotenv"
 
 dotenv.config()
 
-const isDev = process.env.NODE_ENV === "development"
-const isDevTest = process.env.IS_DEV_TEST === "true"
-const MOCK_API_WAIT_TIME = Number(process.env.MOCK_API_WAIT_TIME) || 500
-
 export class ProcessingHelper {
   private appState: AppState
   private llmHelper: LLMHelper
-  private currentProcessingAbortController: AbortController | null = null
-  private currentExtraProcessingAbortController: AbortController | null = null
 
   constructor(appState: AppState) {
     this.appState = appState
-    
-    // Check if user wants to use Ollama
-    const useOllama = process.env.USE_OLLAMA === "true"
-    const ollamaModel = process.env.OLLAMA_MODEL // Don't set default here, let LLMHelper auto-detect
-    const ollamaUrl = process.env.OLLAMA_URL || "http://localhost:11434"
-    
-    if (useOllama) {
-      console.log("[ProcessingHelper] Initializing with Ollama")
-      this.llmHelper = new LLMHelper(undefined, true, ollamaModel, ollamaUrl)
-    } else {
-      const apiKey = process.env.GEMINI_API_KEY
-      if (!apiKey) {
-        throw new Error("GEMINI_API_KEY not found in environment variables. Set GEMINI_API_KEY or enable Ollama with USE_OLLAMA=true")
-      }
-      console.log("[ProcessingHelper] Initializing with Gemini")
-      this.llmHelper = new LLMHelper(apiKey, false)
+
+    const config: OllamaConfig = {
+      reasoningModel: process.env.OLLAMA_REASONING_MODEL || "mistral:7b",
+      visionModel: process.env.OLLAMA_VISION_MODEL || "llava:7b",
+      url: process.env.OLLAMA_URL || "http://localhost:11434"
     }
+
+    console.log("[ProcessingHelper] Ollama config:", config)
+    this.llmHelper = new LLMHelper(config)
   }
 
-  public async processScreenshots(): Promise<void> {
+  // Single entry point — called by Alt+H shortcut
+  // Captures screen and processes it end to end
+  public async captureAndProcess(): Promise<void> {
     const mainWindow = this.appState.getMainWindow()
-    if (!mainWindow) return
+    if (!mainWindow || mainWindow.isDestroyed()) return
 
-    const view = this.appState.getView()
+    // Capture screen using WindowHelper's desktopCapturer method
+    const imagePath = await this.appState.captureScreen()
 
-    if (view === "queue") {
-      const screenshotQueue = this.appState.getScreenshotHelper().getScreenshotQueue()
-      if (screenshotQueue.length === 0) {
-        mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.NO_SCREENSHOTS)
-        return
-      }
-
-      // Check if last screenshot is an audio file
-      const allPaths = this.appState.getScreenshotHelper().getScreenshotQueue();
-      const lastPath = allPaths[allPaths.length - 1];
-      if (lastPath.endsWith('.mp3') || lastPath.endsWith('.wav')) {
-        mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.INITIAL_START);
-        this.appState.setView('solutions');
-        try {
-          const audioResult = await this.llmHelper.analyzeAudioFile(lastPath);
-          mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.PROBLEM_EXTRACTED, audioResult);
-          this.appState.setProblemInfo({ problem_statement: audioResult.text, input_format: {}, output_format: {}, constraints: [], test_cases: [] });
-          return;
-        } catch (err: any) {
-          console.error('Audio processing error:', err);
-          mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.INITIAL_SOLUTION_ERROR, err.message);
-          return;
-        }
-      }
-
-      // NEW: Handle screenshot as plain text (like audio)
-      mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.INITIAL_START)
-      this.appState.setView("solutions")
-      this.currentProcessingAbortController = new AbortController()
-      try {
-        const imageResult = await this.llmHelper.analyzeImageFile(lastPath);
-        const problemInfo = {
-          problem_statement: imageResult.text,
-          input_format: { description: "Generated from screenshot", parameters: [] as any[] },
-          output_format: { description: "Generated from screenshot", type: "string", subtype: "text" },
-          complexity: { time: "N/A", space: "N/A" },
-          test_cases: [] as any[],
-          validation_type: "manual",
-          difficulty: "custom"
-        };
-        mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.PROBLEM_EXTRACTED, problemInfo);
-        this.appState.setProblemInfo(problemInfo);
-      } catch (error: any) {
-        console.error("Image processing error:", error)
-        mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.INITIAL_SOLUTION_ERROR, error.message)
-        // Ensure window stays visible after error
-        if (!this.appState.isVisible()) {
-          this.appState.showMainWindow()
-        }
-      } finally {
-        this.currentProcessingAbortController = null
-      }
-      return;
-    } else {
-      // Debug mode
-      const extraScreenshotQueue = this.appState.getScreenshotHelper().getExtraScreenshotQueue()
-      if (extraScreenshotQueue.length === 0) {
-        console.log("No extra screenshots to process")
-        mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.NO_SCREENSHOTS)
-        return
-      }
-
-      mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.DEBUG_START)
-      this.currentExtraProcessingAbortController = new AbortController()
-
-      try {
-        // Get problem info and current solution
-        const problemInfo = this.appState.getProblemInfo()
-        if (!problemInfo) {
-          throw new Error("No problem info available")
-        }
-
-        // Get current solution from state
-        const currentSolution = await this.llmHelper.generateSolution(problemInfo)
-        const currentCode = currentSolution.solution.code
-
-        // Debug the solution using vision model
-        const debugResult = await this.llmHelper.debugSolutionWithImages(
-          problemInfo,
-          currentCode,
-          extraScreenshotQueue
-        )
-
-        this.appState.setHasDebugged(true)
-        mainWindow.webContents.send(
-          this.appState.PROCESSING_EVENTS.DEBUG_SUCCESS,
-          debugResult
-        )
-
-      } catch (error: any) {
-        console.error("Debug processing error:", error)
-        mainWindow.webContents.send(
-          this.appState.PROCESSING_EVENTS.DEBUG_ERROR,
-          error.message
-        )
-        // Ensure window is still visible after an error
-        if (!this.appState.isVisible()) {
-          this.appState.showMainWindow()
-        }
-      } finally {
-        this.currentExtraProcessingAbortController = null
-      }
-    }
+    // Hand off to LLMHelper — it streams tokens directly to the window
+    await this.llmHelper.processScreenshot(imagePath, mainWindow)
   }
 
-  public cancelOngoingRequests(): void {
-    if (this.currentProcessingAbortController) {
-      this.currentProcessingAbortController.abort()
-      this.currentProcessingAbortController = null
-    }
-
-    if (this.currentExtraProcessingAbortController) {
-      this.currentExtraProcessingAbortController.abort()
-      this.currentExtraProcessingAbortController = null
-    }
-
-    this.appState.setHasDebugged(false)
+  // Called by Alt+R shortcut
+  public cancelOngoing(): void {
+    this.llmHelper.cancelOngoing()
   }
 
-  public async processAudioBase64(data: string, mimeType: string) {
-    // Directly use LLMHelper to analyze inline base64 audio
-    return this.llmHelper.analyzeAudioFromBase64(data, mimeType);
+  public getLLMHelper(): LLMHelper {
+    return this.llmHelper
   }
 
-  // Add audio file processing method
-  public async processAudioFile(filePath: string) {
-    return this.llmHelper.analyzeAudioFile(filePath);
-  }
-
-  public getLLMHelper() {
-    return this.llmHelper;
+  // Called on app quit to clean up Tesseract worker
+  public async destroy(): Promise<void> {
+    await this.llmHelper.destroy()
   }
 }

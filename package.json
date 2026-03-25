@@ -1,5 +1,5 @@
 {
-  "name": "interview-coder",
+  "name": "winhoverchat",
   "version": "1.0.0",
   "main": "./dist-electron/main.js",
   "scripts": {
@@ -17,8 +17,8 @@
     "dist": "npm run app:build"
   },
   "build": {
-    "appId": "com.electron.meeting-notes",
-    "productName": "Meeting Notes Coder",
+    "appId": "com.winhoverchat.app",
+    "productName": "WinHoverChat",
     "files": [
       "dist/**/*",
       "dist-electron/**/*",
@@ -97,7 +97,7 @@
       {
         "provider": "github",
         "owner": "ibttf",
-        "repo": "interview-coder-frontend"
+        "repo": "winhoverchat-frontend"
       }
     ]
   },
